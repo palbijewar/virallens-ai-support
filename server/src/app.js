@@ -15,14 +15,27 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
-const authMiddleware = require("./middleware/auth.middleware");
+const { generateAIResponse } = require("./services/ai.service");
 
-app.get("/protected", authMiddleware, (req, res) => {
-  res.json({
-    success: true,
-    message: "You accessed a protected route",
-    userId: req.user.userId,
-  });
+
+app.get("/test-ai", async (req, res) => {
+  try {
+    const response = await generateAIResponse(
+      "What is the purpose of a customer support assistant?"
+    );
+
+    res.json({
+      success: true,
+      response,
+    });
+} catch (error) {
+  console.error("AI service error:");
+  console.error("Status:", error.response?.status);
+  console.error("Data:", error.response?.data);
+  console.error("Message:", error.message);
+
+  throw new Error("Failed to generate AI response");
+}
 });
 app.get("/health", (req, res) => {
   res.json({
