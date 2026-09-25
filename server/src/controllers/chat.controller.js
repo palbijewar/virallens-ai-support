@@ -56,6 +56,35 @@ const sendMessage = async (req, res) => {
   }
 };
 
+const getChatHistory = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const conversation = await Conversation.findOne({ userId });
+
+    if (!conversation) {
+      return res.json({
+        success: true,
+        messages: [],
+      });
+    }
+
+    res.json({
+      success: true,
+      conversationId: conversation._id,
+      messages: conversation.messages,
+    });
+  } catch (error) {
+    console.error("Get chat history error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch chat history",
+    });
+  }
+};
+
 module.exports = {
   sendMessage,
+  getChatHistory,
 };
