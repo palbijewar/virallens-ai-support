@@ -1,0 +1,61 @@
+const Conversation = require("../models/Conversation");
+const { generateAIResponse } = require("../services/ai.service");
+
+const sendMessage = async (req, res) => {
+  try {
+    const { message } = req.body;
+    const userId = req.user.userId;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Message is required",
+      });
+    }
+
+    // Generate AI response
+    const aiResponse = await generateAIResponse(message);
+
+    // Find existing conversation
+    let conversation = await Conversation.findOne({ userId });
+
+    // Create conversation if user doesn't have one
+    if (!conversation) {
+      conversation = new Conversation({
+        userId,
+        messages: [],
+      });
+    }
+
+    // Add user message
+    conversation.messages.push({
+      role: "user",
+      content: message.trim(),
+    });
+
+    // Add AI response
+    conversation.messages.push({
+      role: "assistant",
+      content: aiResponse,
+    });
+
+    await conversation.save();
+
+    res.json({
+      success: true,
+      response: aiResponse,
+      conversationId: conversation._id,
+    });
+  } catch (error) {
+    console.error("Send message error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to process message",
+    });
+  }
+};
+
+module.exports = {
+  sendMessage,
+};
