@@ -9,11 +9,27 @@ const connectDB = require("./config/db");
 
 dotenv.config();
 
+const requiredEnv = [
+  "MONGO_URI",
+  "JWT_SECRET",
+  "OPENROUTER_API_KEY",
+];
+
+for (const key of requiredEnv) {
+  if (!process.env[key]) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+}
+
 const app = express();
 
 connectDB();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5174",
+  })
+);
 app.use(express.json());
 
 const authLimiter = rateLimit({
