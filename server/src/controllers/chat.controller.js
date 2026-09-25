@@ -58,7 +58,7 @@ const sendMessage = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: "Failed to process message",
+      message: error.message || "Failed to process message",
     });
   }
 };

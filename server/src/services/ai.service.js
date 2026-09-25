@@ -39,7 +39,21 @@ Rules:
   } catch (error) {
     console.error("AI service error:", error.response?.data || error.message);
 
-    throw new Error("Failed to generate AI response");
+    const status = error.response?.status;
+
+    if (status === 401) {
+      throw new Error("AI service authentication failed");
+    }
+
+    if (status === 429) {
+      throw new Error("AI service rate limit reached");
+    }
+
+    if (status === 404) {
+      throw new Error("AI model is currently unavailable");
+    }
+
+    throw new Error("AI service temporarily unavailable");
   }
 };
 
