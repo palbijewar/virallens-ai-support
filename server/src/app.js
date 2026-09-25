@@ -15,7 +15,15 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
+const authMiddleware = require("./middleware/auth.middleware");
 
+app.get("/protected", authMiddleware, (req, res) => {
+  res.json({
+    success: true,
+    message: "You accessed a protected route",
+    userId: req.user.userId,
+  });
+});
 app.get("/health", (req, res) => {
   res.json({
     success: true,
