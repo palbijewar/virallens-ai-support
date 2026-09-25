@@ -6,10 +6,17 @@ const sendMessage = async (req, res) => {
     const { message } = req.body;
     const userId = req.user.userId;
 
-    if (!message || !message.trim()) {
+    if (!message || typeof message !== "string" || !message.trim()) {
       return res.status(400).json({
         success: false,
         message: "Message is required",
+      });
+    }
+
+    if (message.trim().length > 2000) {
+      return res.status(400).json({
+        success: false,
+        message: "Message cannot exceed 2000 characters",
       });
     }
 
