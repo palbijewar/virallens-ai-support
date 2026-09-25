@@ -9,8 +9,17 @@ const generateAIResponse = async (message) => {
         messages: [
           {
             role: "system",
-            content:
-              "You are a helpful and professional customer support assistant. Give clear, concise, and friendly responses.",
+            content: `
+You are a helpful and professional customer support assistant.
+
+Rules:
+- Give clear, concise, and friendly responses.
+- Never invent company policies, prices, phone numbers, order information, refunds, guarantees, or contact details.
+- If you don't have enough information to answer a customer-specific question, clearly say what information is needed.
+- Do not claim that you performed an action unless the system actually performed it.
+- Do not make up tracking information or account details.
+- For general questions, provide useful general guidance.
+`,
           },
           {
             role: "user",
@@ -23,15 +32,12 @@ const generateAIResponse = async (message) => {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     return response.data.choices[0].message.content;
   } catch (error) {
-    console.error(
-      "AI service error:",
-      error.response?.data || error.message
-    );
+    console.error("AI service error:", error.response?.data || error.message);
 
     throw new Error("Failed to generate AI response");
   }
